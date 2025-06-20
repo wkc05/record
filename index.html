@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比赛成绩管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            color: white;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-admin {
+            background: #9b59b6;
+        }
+        
+        .btn-admin:hover {
+            background: #8e44ad;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+        }
+        
+        .view-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-view {
+            display: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .user-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .data-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 4px solid #3498db;
+        }
+        
+        .data-card h3 {
+            color: #3498db;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .data-card h3 i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        .data-card p {
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .empty-message i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .mode-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .user-mode {
+            background: #3498db;
+            color: white;
+        }
+        
+        .admin-mode {
+            background: #9b59b6;
+            color: white;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px 0;
+            margin-top: 30px;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .encryption-info {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #e0e0e0;
+        }
+        
+        .mobile-warning {
+            display: none;
+            background: #ff9800;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .github-guide {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        .github-guide h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .github-guide h2 i {
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .guide-steps {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .guide-steps li {
+            margin-bottom: 10px;
+        }
+        
+        .github-btn {
+            display: inline-flex;
+            align-items: center;
+            background: #24292e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .github-btn i {
+            margin-right: 8px;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+            
+            input {
+                padding: 10px;
+                font-size: 15px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 15px;
+            }
+            
+            .data-card {
+                padding: 12px;
+            }
+            
+            .data-card h3 {
+                font-size: 1rem;
+            }
+            
+            .data-card p {
+                font-size: 1rem;
+            }
+            
+            .mobile-warning {
+                display: block;
+            }
+            
+            .github-guide {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>比赛成绩管理系统</h1>
+            <p>提交您的参赛信息，安全存储您的比赛成绩数据</p>
+        </header>
+        
+        <div class="mobile-warning">
+            <i class="fas fa-mobile-alt"></i> 手机用户请横向屏幕以获得最佳体验
+        </div>
+        
+        <div class="view-controls">
+            <button id="userViewBtn" class="btn">
+                <i class="fas fa-user"></i> 用户视图
+            </button>
+            <button id="adminViewBtn" class="btn btn-admin">
+                <i class="fas fa-lock"></i> 管理员视图
+            </button>
+        </div>
+        
+        <!-- 用户视图 -->
+        <div id="userView" class="user-view">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-edit"></i> 提交参赛信息 <span class="mode-indicator user-mode">用户模式</span></h2>
+                
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" required placeholder="请输入您的姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="city">所在城市</label>
+                        <input type="text" id="city" required placeholder="请输入您所在的城市">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="idCard">身份证号</label>
+                        <input type="text" id="idCard" required placeholder="请输入18位身份证号码" pattern="\d{17}[\dXx]">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="score">比赛成绩</label>
+                        <input type="number" id="score" required placeholder="请输入您的比赛成绩" min="0" max="100" step="0.01">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i> 提交信息
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-chart-line"></i> 我的参赛信息</h2>
+                <div id="userDataContainer">
+                    <div class="empty-message">
+                        <i class="fas fa-database"></i>
+                        <p>您还没有提交任何信息，请填写表单提交您的参赛数据</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 管理员视图 -->
+        <div id="adminView" class="admin-view">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-tachometer-alt"></i> 管理员控制面板 <span class="mode-indicator admin-mode">管理员模式</span></h2>
+                
+                <div class="admin-actions">
+                    <button id="refreshData" class="btn">
+                        <i class="fas fa-sync-alt"></i> 刷新数据
+                    </button>
+                    <button id="clearData" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> 清除所有数据
+                    </button>
+                </div>
+                
+                <div id="adminDataContainer">
+                    <div class="empty-message">
+                        <i class="fas fa-database"></i>
+                        <p>系统中暂无任何参赛者数据</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="encryption-info">
+            <i class="fas fa-shield-alt"></i> 安全提示：所有身份证信息在存储时都经过加密处理，保护用户隐私
+        </div>
+        
+        <div class="github-guide">
+            <h2><i class="fab fa-github"></i> 如何生成公共链接</h2>
+            <p>使用GitHub Pages生成公共链接的步骤：</p>
+            <ol class="guide-steps">
+                <li>访问 <a href="https://github.com" target="_blank">GitHub官网</a> 并注册账户</li>
+                <li>创建一个新仓库（Repository）</li>
+                <li>将本页代码保存为 <code>index.html</code> 文件</li>
+                <li>将文件上传到您的GitHub仓库</li>
+                <li>进入仓库设置 → 选择 Pages → 启用GitHub Pages</li>
+                <li>复制生成的公共链接分享给他人</li>
+            </ol>
+            <a href="https://github.com/" target="_blank" class="github-btn">
+                <i class="fab fa-github"></i> 前往GitHub
+            </a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 比赛成绩管理系统 | 使用GitHub Pages发布</p>
+    </footer>
+    
+    <script>
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认视图
+            showUserView();
+            
+            // 加载用户数据
+            loadUserData();
+            
+            // 加载管理员数据
+            loadAdminData();
+            
+            // 事件监听
+            document.getElementById('userViewBtn').addEventListener('click', showUserView);
+            document.getElementById('adminViewBtn').addEventListener('click', showAdminView);
+            document.getElementById('userForm').addEventListener('submit', submitForm);
+            document.getElementById('refreshData').addEventListener('click', loadAdminData);
+            document.getElementById('clearData').addEventListener('click', clearAllData);
+            
+            // 添加手机触摸优化
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('touchstart', function() {
+                    this.style.fontSize = '18px';
+                });
+            });
+        });
+        
+        // 显示用户视图
+        function showUserView() {
+            document.getElementById('userView').style.display = 'block';
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('userViewBtn').classList.add('btn-success');
+            document.getElementById('adminViewBtn').classList.remove('btn-success');
+        }
+        
+        // 显示管理员视图
+        function showAdminView() {
+            document.getElementById('userView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'block';
+            document.getElementById('adminViewBtn').classList.add('btn-success');
+            document.getElementById('userViewBtn').classList.remove('btn-success');
+            loadAdminData();
+        }
+        
+        // 提交表单
+        function submitForm(e) {
+            e.preventDefault();
+            
+            const userData = {
+                name: document.getElementById('name').value,
+                city: document.getElementById('city').value,
+                idCard: document.getElementById('idCard').value,
+                score: parseFloat(document.getElementById('score').value),
+                timestamp: new Date().toISOString()
+            };
+            
+            // 验证身份证格式
+            if (!validateIdCard(userData.idCard)) {
+                alert('请输入有效的18位身份证号码');
+                return;
+            }
+            
+            // 验证成绩
+            if (isNaN(userData.score) || userData.score < 0 || userData.score > 100) {
+                alert('请输入有效的比赛成绩 (0-100)');
+                return;
+            }
+            
+            // 保存数据
+            saveUserData(userData);
+            
+            // 重新加载用户数据
+            loadUserData();
+            
+            // 重置表单
+            document.getElementById('userForm').reset();
+            
+            alert('信息提交成功！');
+        }
+        
+        // 验证身份证号码
+        function validateIdCard(idCard) {
+            const reg = /^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
+            return reg.test(idCard);
+        }
+        
+        // 简单加密函数（演示用途）
+        function simpleEncrypt(text) {
+            return text.split('').map(char => 
+                String.fromCharCode(char.charCodeAt(0) + 3)
+            ).join('');
+        }
+        
+        // 简单解密函数（演示用途）
+        function simpleDecrypt(text) {
+            return text.split('').map(char => 
+                String.fromCharCode(char.charCodeAt(0) - 3)
+            ).join('');
+        }
+        
+        // 保存用户数据
+        function saveUserData(userData) {
+            // 加密身份证号
+            const encryptedIdCard = simpleEncrypt(userData.idCard);
+            
+            // 创建存储对象
+            const storageData = {
+                ...userData,
+                idCard: encryptedIdCard
+            };
+            
+            // 获取现有数据
+            let allData = JSON.parse(localStorage.getItem('competitionData')) || [];
+            
+            // 检查是否已存在相同身份证号的数据
+            const existingIndex = allData.findIndex(item => 
+                simpleDecrypt(item.idCard) === userData.idCard
+            );
+            
+            // 更新或添加数据
+            if (existingIndex !== -1) {
+                allData[existingIndex] = storageData;
+            } else {
+                allData.push(storageData);
+            }
+            
+            // 保存回localStorage
+            localStorage.setItem('competitionData', JSON.stringify(allData));
+        }
+        
+        // 加载用户数据
+        function loadUserData() {
+            const idCard = document.getElementById('idCard').value;
+            
+            if (!idCard) {
+                document.getElementById('userDataContainer').innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-database"></i>
+                        <p>请输入您的身份证号并提交信息以查看数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const allData = JSON.parse(localStorage.getItem('competitionData')) || [];
+            const userData = allData.find(item => 
+                simpleDecrypt(item.idCard) === idCard
+            );
+            
+            if (userData) {
+                // 解密身份证号
+                const decryptedIdCard = simpleDecrypt(userData.idCard);
+                
+                document.getElementById('userDataContainer').innerHTML = `
+                    <div class="user-data">
+                        <div class="data-card">
+                            <h3><i class="fas fa-user"></i> 姓名</h3>
+                            <p>${userData.name}</p>
+                        </div>
+                        <div class="data-card">
+                            <h3><i class="fas fa-city"></i> 城市</h3>
+                            <p>${userData.city}</p>
+                        </div>
+                        <div class="data-card">
+                            <h3><i class="fas fa-id-card"></i> 身份证号</h3>
+                            <p>${decryptedIdCard.substring(0, 6)}********${decryptedIdCard.substring(14)}</p>
+                        </div>
+                        <div class="data-card">
+                            <h3><i class="fas fa-medal"></i> 比赛成绩</h3>
+                            <p>${userData.score.toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('userDataContainer').innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-database"></i>
+                        <p>没有找到您的信息，请提交参赛数据</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 加载管理员数据
+        function loadAdminData() {
+            const allData = JSON.parse(localStorage.getItem('competitionData')) || [];
+            
+            if (allData.length === 0) {
+                document.getElementById('adminDataContainer').innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-database"></i>
+                        <p>系统中暂无任何参赛者数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 创建表格
+            let tableHTML = `
+                <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>城市</th>
+                            <th>身份证号</th>
+                            <th>比赛成绩</th>
+                            <th>提交时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            allData.forEach(data => {
+                // 解密身份证号
+                const decryptedIdCard = simpleDecrypt(data.idCard);
+                const maskedIdCard = decryptedIdCard.substring(0, 6) + '********' + decryptedIdCard.substring(14);
+                
+                const date = new Date(data.timestamp);
+                const formattedDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                
+                tableHTML += `
+                    <tr>
+                        <td>${data.name}</td>
+                        <td>${data.city}</td>
+                        <td>${maskedIdCard}</td>
+                        <td>${data.score.toFixed(2)}</td>
+                        <td>${formattedDate}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+                </div>
+                <p style="margin-top: 15px; text-align: right; font-weight: 600;">总计: ${allData.length} 条记录</p>
+            `;
+            
+            document.getElementById('adminDataContainer').innerHTML = tableHTML;
+        }
+        
+        // 清除所有数据
+        function clearAllData() {
+            if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
+                localStorage.removeItem('competitionData');
+                loadAdminData();
+                alert('所有数据已清除');
+            }
+        }
+    </script>
+</body>
+</html>
